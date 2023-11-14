@@ -122,12 +122,6 @@ async def process_prompt(request: PromptRequest):
   return jsonable_encoder(PromptResult(result=result["output"]))
 
 
-
-
-
-
-
-
 app.mount("/", StaticFiles(directory="./html-docs", html=True), name="static")
 
 
