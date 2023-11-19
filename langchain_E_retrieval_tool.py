@@ -45,6 +45,7 @@ from langchain.llms import OpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.agents.agent_toolkits import create_retriever_tool
 from langchain.agents.agent_toolkits import create_conversational_retrieval_agent
+from langchain.chains.summarize import load_summarize_chain
 
 import re
 
@@ -82,7 +83,19 @@ def print_result(result: Any) -> None:
 
 llm = ChatOpenAI(model_name=llm_model, temperature=0)
 
+# pdf 문서를 요약 
+def summary_pdf():
 
+    # pdf load 
+    # RecursiveCharacterTextSplitter로 분할 
+    split_docs = load_pdf("./data/프리랜서 가이드라인 (출판본).pdf", True)
+    
+    chain = load_summarize_chain(llm, chain_type="map_reduce")
+    summary = chain.run(split_docs)
+    print(summary)
+    
+    
+    
 
 def get_personal_retriever() -> VectorStoreRetriever:
   personal_texts = [
