@@ -98,39 +98,36 @@ def summary2():
     # RecursiveCharacterTextSplitter로 분할 
     split_docs = load_pdf("./data/프리랜서 가이드라인 (출판본).pdf", True)
     
-    print(split_docs[4])
+ 
     chain = load_summarize_chain(llm, chain_type="map_reduce")
     summary = chain.run(split_docs)
     print(summary)
     
 
+import fitz
 def make_index():
-    file = "./data/프리랜서 가이드라인 (출판본).pdf"
-    loader = PyPDFLoader(file)
-    pages = loader.load()
+    pdf_path = "./data/프리랜서 가이드라인 (출판본).pdf"
+    toc = []
+    pdf_document = fitz.open(pdf_path)
     
-    index_info = []
-    for page in pages:
-        text = page.page_content
+    for page_num in range(pdf_document.page_count):
+        page = pdf_document.load_page(page_num)
+        if 'ToC' in page.get_text("text"):
+            outline = page.get_table_of_contents()
+            toc.extend(outline)
 
-        # 여기서 텍스트에서 색인 정보 추출하는 방법을 구현해야 합니다.
-        # 예를 들어, 정규표현식을 사용하여 특정 패턴을 찾거나 원하는 정보를 추출합니다.
-        # 추출된 정보를 index_info 리스트에 추가할 수 있습니다.
+    pdf_document.close()
 
-        # 예시: 'Index:'라는 키워드가 포함된 텍스트를 찾아 색인 정보로 간주하는 경우
-        if '이 책은 KarenJ<rurounikarenj@gmail.com>님의 책입니다' in text:
-            index_start = text.index('Index:')
-            index_end = text.index('\n', index_start) if '\n' in text[index_start:] else len(text)
-            index_text = text[index_start:index_end].strip()
-            index_info.append(index_text)
-
-
-    print(index_info)
+    print("목차 정보:")
+    for item in toc:
+        print(f"제목: {item[1]}, 페이지 번호: {item[0]}, 레벨: {item[2]}")
+        
+    
      
 if __name__ == '__main__':
     #summary1()
     # pdf 문서 요약
-    summary2()
+ #   summary2()
     
     #index 만들기 
     make_index()
